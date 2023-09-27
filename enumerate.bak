@@ -1,0 +1,61 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
+type EpisodeInfo struct {
+	ID         string `json:"id"`
+	EpisodeNum int    `json:"episode_num"`
+	Season     int    `json:"season"`
+	Title      string `json:"title"`
+	// Add other fields as needed
+}
+
+type Season struct {
+	SeasonNumber int `json:"season_number"`
+	// Add other fields as needed
+}
+
+type SeriesInfoResponse struct {
+	Episodes map[string][]EpisodeInfo `json:"episodes"`
+	Seasons  []Season                 `json:"seasons"`
+	// Add other fields as needed
+}
+
+func main() {
+	// Replace with the actual series ID
+	seriesID := "16"
+
+	// Construct the URL
+	url := fmt.Sprintf("http://patriotservice.hostin.tv:25461/player_api.php?action=get_series_info&username=jiru&password=newpass33&series_id=%s", seriesID)
+
+	// Send the HTTP GET request
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// Decode the JSON response
+	var seriesInfo SeriesInfoResponse
+	err = json.NewDecoder(resp.Body).Decode(&seriesInfo)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Enumerate through the seasons and episodes
+	for _, season := range seriesInfo.Seasons {
+		fmt.Printf("Season %d:\n", season.SeasonNumber)
+		seasonID := fmt.Sprintf("%d", season.SeasonNumber)
+		if episodes, ok := seriesInfo.Episodes[seasonID]; ok {
+			for _, episode := range episodes {
+				fmt.Printf("  Episode %d: %s (ID: %s)\n", episode.EpisodeNum, episode.Title, episode.ID)
+			}
+		}
+	}
+}

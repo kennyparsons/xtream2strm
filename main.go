@@ -22,6 +22,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = process.GetSeries(config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Println("Application executed successfully")
 }

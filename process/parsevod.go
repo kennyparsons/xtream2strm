@@ -46,10 +46,14 @@ func CreateStrmFile(vod models.VODStream, config models.Config) error {
 	// Sanitize the name for the file name
 	fileName := sanitizeFileName(vod.Name) + ".strm"
 	// Construct the file path
-	filePath := filepath.Join(config.OutputDir, fileName)
+	filePath := filepath.Join(config.OutputDir, "movies", fileName)
 	// Check if the output directory exists, if not, create it
 	if _, err := os.Stat(config.OutputDir); os.IsNotExist(err) {
 		os.MkdirAll(config.OutputDir, os.ModePerm)
+	}
+	// Check if the movies directory exists, if not, create it
+	if _, err := os.Stat(filepath.Join(config.OutputDir, "movies")); os.IsNotExist(err) {
+		os.MkdirAll(filepath.Join(config.OutputDir, "movies"), os.ModePerm)
 	}
 
 	// Construct the file content
