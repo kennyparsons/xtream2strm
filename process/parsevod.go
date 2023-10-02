@@ -87,11 +87,21 @@ func ParseVODData(vodData models.XtreamCodesJSON, config models.Config) error {
 			}
 		}
 		if !ignore {
+			vfsMovie(vod, config)
 			err := CreateStrmFile(vod, config)
 			if err != nil {
 				// log the error for this stream and continue
 				log.Printf("Failed to create strm file for stream %s: %v\n", vod.Name, err)
 			}
+			// err := CreateNginxConfigFile(vod, config)
+			// if err != nil {
+			// 	// log the error for this stream and continue
+			// 	log.Printf("Failed to create nginx config file for stream %s: %v\n", vod.Name, err)
+			// }
+			// Ask the user to press enter to continue
+			// fmt.Println("Press enter to continue...")
+			// fmt.Scanln()
+
 		}
 	}
 	return nil

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"xtream2strm/models"
 
@@ -9,6 +10,9 @@ import (
 
 func LoadConfig(configPath string) (models.Config, error) {
 	var config models.Config
+
+	// debug, print the config path
+	fmt.Println(configPath)
 
 	// Open the configuration file
 	file, err := os.Open(configPath)
