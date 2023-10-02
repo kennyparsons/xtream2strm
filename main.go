@@ -2,18 +2,35 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"xtream2strm/config"
+	"xtream2strm/idsearch"
 )
 
 func main() {
 	configPath := flag.String("config", "config.yaml", "path to the config file")
+	searchTerm := flag.String("search", "", "search for a movie or series")
 	flag.Parse()
 
 	config, err := config.LoadConfig(*configPath)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// check for a parameter passed at runtime called --search
+	// --search will be followed by a search term
+	// if a search term is provided, run idsearch.SearchVOD() and idsearch.SearchSeries() and do not run the rest of the code.
+	// if no search term is provided, run the rest of the code as normal.
+	// if a search term is provided, print the results to the console and exit the program.
+	if *searchTerm != "" {
+		fmt.Println("Searching for", *searchTerm)
+		fmt.Println("Searching for", *searchTerm, "in movies...")
+		vodresults := idsearch.SearchVOD(*searchTerm, config)
+		idsearch.DisplaySearchResults(vodresults)
+		// fmt.Println("Searching for", *searchTerm, "in series...")
+
 	}
 
 	// // Register the FileHandler to handle incoming requests
