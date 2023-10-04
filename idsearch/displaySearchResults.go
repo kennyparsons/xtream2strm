@@ -10,11 +10,17 @@ func DisplaySearchResults(results []SearchResult) {
 		return
 	}
 
-	fmt.Println("---------------------------------------------------")
-	fmt.Println("| ID       | Name                                               | Type  | Distance |")
-	fmt.Println("---------------------------------------------------")
+	// fmt.Println("---------------------------------------------------")
+	// fmt.Println("| ID       | Name                                               | Type  | Distance |")
+	// fmt.Println("---------------------------------------------------")
+	// for _, result := range results {
+	// 	fmt.Printf("| %-7d | %-50s | %-5s | %-8d |\n", result.ID, result.Name, result.Type, result.Distance)
+	// }
+	// fmt.Println("---------------------------------------------------")
+
+	// Display results in a way that can be copied and pasted into the yaml
+	// example: "  - 12345 # Movie Name"
 	for _, result := range results {
-		fmt.Printf("| %-7d | %-50s | %-5s | %-8d |\n", result.ID, result.Name, result.Type, result.Distance)
+		fmt.Printf("  - %d # %s\n", result.ID, result.Name)
 	}
-	fmt.Println("---------------------------------------------------")
 }

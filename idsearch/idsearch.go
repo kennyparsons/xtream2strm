@@ -31,40 +31,32 @@ func SearchVOD(query string, config models.Config) []SearchResult {
 			})
 		}
 	}
-	// order the results by distance. Highest distance first.
+
 	return results
 }
 
-// func SearchVOD(query string, vodData models.XtreamCodesJSON) []SearchResult {
-//     var results []SearchResult
+func SearchSeries(query string, config models.Config) []SearchResult {
+	seriesData, err := process.GetSeries(config) // Assuming GetSeries returns SeriesJSON and error
+	if err != nil {
+		log.Fatal(err)
+		return nil
+	}
 
-//     for _, vod := range vodData {
-//         distance := fuzzyMatch(query, vod.Name)
-//         if distance <= len(query)/2 { // or any other threshold you find suitable
-//             results = append(results, SearchResult{
-//                 ID:   vod.StreamID,
-//                 Name: vod.Name,
-//                 Type: "movie",
-//             })
-//         }
-//     }
-
-//     return results
-// }
-
-func SearchSeries(query string, seriesData models.SeriesJSON) []SearchResult {
 	var results []SearchResult
+	normalizedQuery := normalize(query)
 
 	for _, series := range seriesData {
-		distance := fuzzyMatch(query, series.Name)
-		if distance <= len(query)/2 { // or any other threshold you find suitable
+		normalizedTarget := normalize(series.Name)
+
+		if strings.Contains(normalizedTarget, normalizedQuery) {
+			distance := fuzzyMatch(normalizedQuery, normalizedTarget)
 			results = append(results, SearchResult{
-				ID:   series.SeriesID,
-				Name: series.Name,
-				Type: "series",
+				ID:       series.SeriesID,
+				Name:     series.Name,
+				Type:     "series",
+				Distance: distance,
 			})
 		}
 	}
-
 	return results
 }

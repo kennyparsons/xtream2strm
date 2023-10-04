@@ -44,17 +44,34 @@ func CreateSeriesStrmFile(series models.Series, config models.Config) error {
 // ParseSeriesData iterates through each Series and creates an strm file.
 func ParseSeriesData(seriesData models.SeriesJSON, config models.Config) error {
 	// Define a rate limit for the API calls of 1 per second
-	rateLimit := time.NewTicker(1 * time.Second)
+	rateLimit := time.NewTicker(5 * time.Second)
 	defer rateLimit.Stop()
 
 	for _, series := range seriesData {
 		// Check if the Series's CategoryID is in the ignore list
 		ignore := false
+		blacklist := false
+		whitelist := false
 		for _, ignoreCategory := range config.IgnoreCategories {
 			if series.CategoryID == ignoreCategory {
-				ignore = true
+				blacklist = true
 				break
 			}
+		}
+		// Check if the series id is in the series_include list
+		for _, includeSeries := range config.SeriesInclude {
+			if series.SeriesID == includeSeries {
+				whitelist = true
+				// fmt.Printf("%s will be processed, due to movie whitelist\n", vod.Name)
+				break
+			}
+		}
+
+		// set ignore to false only if it's not in the blacklist and it's in the whitelist
+		if !blacklist && whitelist {
+			ignore = false
+		} else {
+			ignore = true
 		}
 		if !ignore {
 			// Wait for the rate limit tick

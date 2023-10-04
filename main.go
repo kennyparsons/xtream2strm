@@ -7,6 +7,7 @@ import (
 
 	"xtream2strm/config"
 	"xtream2strm/idsearch"
+	"xtream2strm/process"
 )
 
 func main() {
@@ -19,18 +20,37 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// check for a parameter passed at runtime called --search
 	// --search will be followed by a search term
-	// if a search term is provided, run idsearch.SearchVOD() and idsearch.SearchSeries() and do not run the rest of the code.
-	// if no search term is provided, run the rest of the code as normal.
-	// if a search term is provided, print the results to the console and exit the program.
 	if *searchTerm != "" {
 		fmt.Println("Searching for", *searchTerm)
 		fmt.Println("Searching for", *searchTerm, "in movies...")
 		vodresults := idsearch.SearchVOD(*searchTerm, config)
 		idsearch.DisplaySearchResults(vodresults)
-		// fmt.Println("Searching for", *searchTerm, "in series...")
+		fmt.Println("Searching for", *searchTerm, "in series...")
+		seriesresults := idsearch.SearchSeries(*searchTerm, config)
+		idsearch.DisplaySearchResults(seriesresults)
 
+		// quit the program after displaying the search results
+		return
+
+	}
+
+	xtreamData, err := process.GetVOD(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = process.ParseVODData(xtreamData, config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	seriesData, err := process.GetSeries(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = process.ParseSeriesData(seriesData, config)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	// // Register the FileHandler to handle incoming requests

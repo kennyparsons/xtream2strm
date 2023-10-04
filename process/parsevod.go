@@ -44,9 +44,11 @@ func sanitizeFileName(name string) string {
 // CreateStrmFile creates an strm file for a given VOD stream.
 func CreateStrmFile(vod models.VODStream, config models.Config) error {
 	// Sanitize the name for the file name
-	fileName := sanitizeFileName(vod.Name) + ".strm"
+	movieName := sanitizeFileName(vod.Name)
+	// Construct the file name
+	fileName := movieName + ".strm"
 	// Construct the file path
-	filePath := filepath.Join(config.OutputDir, "movies", fileName)
+	filePath := filepath.Join(config.OutputDir, "movies", movieName, fileName)
 	// Check if the output directory exists, if not, create it
 	if _, err := os.Stat(config.OutputDir); os.IsNotExist(err) {
 		os.MkdirAll(config.OutputDir, os.ModePerm)
@@ -54,6 +56,10 @@ func CreateStrmFile(vod models.VODStream, config models.Config) error {
 	// Check if the movies directory exists, if not, create it
 	if _, err := os.Stat(filepath.Join(config.OutputDir, "movies")); os.IsNotExist(err) {
 		os.MkdirAll(filepath.Join(config.OutputDir, "movies"), os.ModePerm)
+	}
+	// Check if the moviename directory exists, if not, create it
+	if _, err := os.Stat(filepath.Join(config.OutputDir, "movies", movieName)); os.IsNotExist(err) {
+		os.MkdirAll(filepath.Join(config.OutputDir, "movies", movieName), os.ModePerm)
 	}
 
 	// Construct the file content
@@ -80,12 +86,32 @@ func ParseVODData(vodData models.XtreamCodesJSON, config models.Config) error {
 	for _, vod := range vodData {
 		// Check if the VODStream's CategoryID is in the ignore list
 		ignore := false
+		blacklist := false
+		whitelist := false
 		for _, ignoreCategory := range config.IgnoreCategories {
 			if vod.CategoryID == ignoreCategory {
-				ignore = true
+				blacklist = true
+				// fmt.Printf("%s will be ignored, due to category blacklist\n", vod.Name)
 				break
 			}
 		}
+
+		// Check if the VODStream id is in the movie_include list
+		for _, includeMovie := range config.MovieInclude {
+			if vod.StreamID == includeMovie {
+				whitelist = true
+				// fmt.Printf("%s will be processed, due to movie whitelist\n", vod.Name)
+				break
+			}
+		}
+
+		// set ignore to false only if it's not in the blacklist and it's in the whitelist
+		if !blacklist && whitelist {
+			ignore = false
+		} else {
+			ignore = true
+		}
+
 		if !ignore {
 			vfsMovie(vod, config)
 			err := CreateStrmFile(vod, config)
@@ -93,15 +119,6 @@ func ParseVODData(vodData models.XtreamCodesJSON, config models.Config) error {
 				// log the error for this stream and continue
 				log.Printf("Failed to create strm file for stream %s: %v\n", vod.Name, err)
 			}
-			// err := CreateNginxConfigFile(vod, config)
-			// if err != nil {
-			// 	// log the error for this stream and continue
-			// 	log.Printf("Failed to create nginx config file for stream %s: %v\n", vod.Name, err)
-			// }
-			// Ask the user to press enter to continue
-			// fmt.Println("Press enter to continue...")
-			// fmt.Scanln()
-
 		}
 	}
 	return nil
