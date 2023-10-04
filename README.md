@@ -40,14 +40,14 @@ Xtream2strm is a utility tool designed to fetch stream data from Xtream Codes AP
    password: "your-password"
    output_dir: "path/to/output/directory"
    ignore_categories:
-   - "category-id-1"
-   - "category-id-2"
+     - "category-id-1"
+     - "category-id-2"
    movie_include:
-   - "movie-id-1"
-   - "movie-id-2"
+     - "movie-id-1"
+     - "movie-id-2"
    series_include:
-   - "series-id-1"
-   - "series-id-2"
+     - "series-id-1"
+     - "series-id-2"
    ```
 2. Run the tool.
    ```sh
