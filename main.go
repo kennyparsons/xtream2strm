@@ -16,6 +16,11 @@ func main() {
 	restrictTo := flag.String("restrict-to", "", "restrict operations to specific types (e.g., movies,tv)")
 	flag.Parse()
 
+	// // debug, print the flags and arguments
+	// fmt.Println("configPath:", *configPath)
+	// fmt.Println("searchTerm:", *searchTerm)
+	// fmt.Println("restrictTo:", *restrictTo)
+
 	config, err := config.LoadConfig(*configPath)
 	if err != nil {
 		log.Fatal(err)

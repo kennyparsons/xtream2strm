@@ -8,4 +8,8 @@ type Config struct {
 	IgnoreCategories []string `yaml:"ignore_categories"`
 	MovieInclude     []int    `yaml:"movie_include"`  // Whitelist for movies
 	SeriesInclude    []int    `yaml:"series_include"` // Whitelist for series
+	NotFound         struct {
+		Movies string `yaml:"movies"`
+		TV     string `yaml:"tv"`
+	} `yaml:"notfound"`
 }
